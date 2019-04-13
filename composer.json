@@ -1,0 +1,17 @@
+{
+    "name": "haskel/map-serializer-bundle",
+    "type": "symfony-bundle",
+    "description": "This Bundle integrates library haskel/map-serializer into Symfony",
+    "keywords": ["rest"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pavel Haskel",
+            "email": "haskel.pavel@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/http-kernel": "~4.0"
+    }
+}
