@@ -1,5 +1,6 @@
 services:
   haskel.map_serializer.response_listener:
+    class: 'Haskel\MapSerializerBundle\EventListener\ResponseListener'
     public: false
     tags:
       - {name: kernel.event_listener, event: kernel.view }
@@ -8,5 +9,8 @@ services:
       $projectDir: '%kernel.project_dir%'
 
   haskel.map_serializer.schema_annotation_listener:
+    class: 'Haskel\MapSerializerBundle\EventListener\SchemaAnnotationListener'
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+    arguments:
+      $annotationReader: '@doctrine.orm.metadata.annotation_reader'

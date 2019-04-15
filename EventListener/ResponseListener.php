@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http;
+namespace Haskel\MapSerializerBundle\EventListener;
 
 use Haskel\MapSerializerBundle\Annotation\Schema;
 use Haskel\SchemaSerializer\EntityExtractor\ExtractorGenerator;
@@ -30,7 +30,7 @@ class ResponseListener
     /**
      * @param Serializer $serializer
      */
-    public function __construct($projectDir)
+    public function __construct(Serializer $serializer, $projectDir)
     {
         $this->serializer = $serializer;
         $this->projectDir = $projectDir;
@@ -41,36 +41,9 @@ class ResponseListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        $result   = $event->getControllerResult();
-//        $serializer = new Serializer();
-//        $serializer->addFormatter(new DatetimeFormatter());
-//        $generator = new ExtractorGenerator('MapSerializerCache');
-
-//        $cacheDirectory = $this->projectDir . "/var/cache/map_serializer";
-//        $serializer->setExtractorsDir($cacheDirectory);
-
-//        $finder = new Finder();
-//        $finder->files()->in($this->projectDir . "/config/map_serializer");
-//        foreach ($finder as $file) {
-//            $typeSchemas = Yaml::parseFile($file->getRealPath());
-//            foreach ($typeSchemas as $type => $schemas) {
-//                foreach ($schemas as $schemaName => $schema) {
-//                    $serializer->addSchema($type, $schemaName, $schema);
-//
-//                    try {
-//                        $generated = $generator->generate($type, $schemaName, $schema);
-//                        $generated->saveFile($cacheDirectory);
-//                        $serializer->addExtractor($type, $schemaName, $generated->getFullClassName());
-//                    } catch (ExtractorGeneratorException $e) {
-//
-//                    }
-//                }
-//            }
-//        }
-
-
+        $result  = $event->getControllerResult();
         $request = $event->getRequest();
-        $schema = 'default';
+        $schema  = 'default';
         if ($request->attributes->has(Schema::ATTR)) {
             $schema = $request->attributes->get(Schema::ATTR);
         }
