@@ -1,0 +1,12 @@
+services:
+  haskel.map_serializer.response_listener:
+    public: false
+    tags:
+      - {name: kernel.event_listener, event: kernel.view }
+    bind:
+      $serializer: '@haskel.map_serializer.serializer'
+      $projectDir: '%kernel.project_dir%'
+
+  haskel.map_serializer.schema_annotation_listener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

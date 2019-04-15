@@ -1,0 +1,3 @@
+services:
+  haskel.map_serializer.serializer:
+    class: 'Haskel\SchemaSerializer\Serializer'
