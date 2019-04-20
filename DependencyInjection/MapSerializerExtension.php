@@ -14,24 +14,34 @@ use Symfony\Component\Yaml\Yaml;
 
 class MapSerializerExtension extends Extension
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'),
+                                 $container->getParameter('kernel.project_dir'),
+                                 $container->getParameter('kernel.cache_dir'));
+    }
+
     public function load(array $configs, ContainerBuilder $container)
     {
+        $configuration = $this->getConfiguration($configs, $container);
+        $config = $this->processConfiguration($configuration, $configs);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('listeners.yaml');
         $loader->load('serializer.yaml');
-
 
         $serializer = $container->getDefinition('haskel.map_serializer.serializer');
         $datetimeFormatter = $container->setDefinition('haskel.map_serializer.formatter.datetime', new Definition(DatetimeFormatter::class));
         $serializer->addMethodCall('addFormatter', [$datetimeFormatter]);
 
-        $generator = new ExtractorGenerator('MapSerializerCache');
-        $projectDir = $container->getParameter('kernel.project_dir');
-        $cacheDirectory = $projectDir . "/var/cache/map_serializer";
-        $serializer->addMethodCall('setExtractorsDir', [$cacheDirectory]);
+        $generator = new ExtractorGenerator($config['extractor_namespace']);
+        $serializer->addMethodCall('setExtractorsDir', [$config['cache_dir']]);
 
         $finder = new Finder();
-        $finder->files()->in($projectDir . "/config/map_serializer");
+        $finder->files()->in($config['config_dir']);
         foreach ($finder as $file) {
             $typeSchemas = Yaml::parseFile($file->getRealPath());
             foreach ($typeSchemas as $type => $schemas) {
@@ -40,7 +50,7 @@ class MapSerializerExtension extends Extension
 
                     try {
                         $generated = $generator->generate($type, $schemaName, $schema);
-                        $generated->saveFile($cacheDirectory);
+                        $generated->saveFile($config['cache_dir']);
                         $serializer->addMethodCall('addExtractor', [$type, $schemaName, $generated->getFullClassName()]);
                     } catch (ExtractorGeneratorException $e) {
 
@@ -48,6 +58,10 @@ class MapSerializerExtension extends Extension
                 }
             }
         }
+
+        $responseListener = $container->getDefinition('haskel.map_serializer.response_listener');
+        $responseListener->addArgument($container->getDefinition('haskel.map_serializer.serializer'));
+        $responseListener->addArgument($config['default_schema_name']);
     }
 
 }

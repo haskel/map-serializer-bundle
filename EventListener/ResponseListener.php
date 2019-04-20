@@ -25,15 +25,15 @@ class ResponseListener
     /**
      * @var string
      */
-    private $projectDir;
+    private $defaultSchema;
 
     /**
      * @param Serializer $serializer
      */
-    public function __construct(Serializer $serializer, $projectDir)
+    public function __construct(Serializer $serializer, $defaultSchema)
     {
         $this->serializer = $serializer;
-        $this->projectDir = $projectDir;
+        $this->defaultSchema = $defaultSchema;
     }
 
     /**
@@ -43,7 +43,7 @@ class ResponseListener
     {
         $result  = $event->getControllerResult();
         $request = $event->getRequest();
-        $schema  = 'default';
+        $schema  = $this->defaultSchema;
         if ($request->attributes->has(Schema::ATTR)) {
             $schema = $request->attributes->get(Schema::ATTR);
         }
