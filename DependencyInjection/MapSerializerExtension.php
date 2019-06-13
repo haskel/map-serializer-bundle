@@ -1,9 +1,9 @@
 <?php
 namespace Haskel\MapSerializerBundle\DependencyInjection;
 
-use Haskel\SchemaSerializer\EntityExtractor\ExtractorGenerator;
-use Haskel\SchemaSerializer\Exception\ExtractorGeneratorException;
-use Haskel\SchemaSerializer\Formatter\DatetimeFormatter;
+use Haskel\MapSerializer\EntityExtractor\ExtractorGenerator;
+use Haskel\MapSerializer\Exception\ExtractorGeneratorException;
+use Haskel\MapSerializer\Formatter\DatetimeFormatter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -37,20 +37,32 @@ class MapSerializerExtension extends Extension
         $datetimeFormatter = $container->setDefinition('haskel.map_serializer.formatter.datetime', new Definition(DatetimeFormatter::class));
         $serializer->addMethodCall('addFormatter', [$datetimeFormatter]);
 
+        $extractorsDir = $config['cache_dir'] . "/extractor";
         $generator = new ExtractorGenerator($config['extractor_namespace']);
-        $serializer->addMethodCall('setExtractorsDir', [$config['cache_dir']]);
+        $serializer->addMethodCall('setExtractorsDir', [$extractorsDir]);
 
+        $yamlParsedDir = $config['cache_dir'] . "/yaml_cache";
+        if (!file_exists($yamlParsedDir)) {
+            mkdir($yamlParsedDir, 0755, true);
+        }
         $finder = new Finder();
         $finder->files()->in($config['config_dir']);
         foreach ($finder as $file) {
-            $typeSchemas = Yaml::parseFile($file->getRealPath());
+            $cacheFileName = md5($file->getContents());
+            $cacheFile = $yamlParsedDir . "/" . $cacheFileName;
+            if (file_exists($cacheFile)) {
+                $typeSchemas = unserialize(file_get_contents($cacheFile));
+            } else {
+                $typeSchemas = Yaml::parseFile($file->getRealPath());
+                file_put_contents($cacheFile, serialize($typeSchemas));
+            }
             foreach ($typeSchemas as $type => $schemas) {
                 foreach ($schemas as $schemaName => $schema) {
                     $serializer->addMethodCall('addSchema', [$type, $schemaName, $schema]);
 
                     try {
                         $generated = $generator->generate($type, $schemaName, $schema);
-                        $generated->saveFile($config['cache_dir']);
+                        $generated->saveFile($extractorsDir);
                         $serializer->addMethodCall('addExtractor', [$type, $schemaName, $generated->getFullClassName()]);
                     } catch (ExtractorGeneratorException $e) {
 

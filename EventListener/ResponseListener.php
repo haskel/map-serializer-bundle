@@ -3,10 +3,10 @@
 namespace Haskel\MapSerializerBundle\EventListener;
 
 use Haskel\MapSerializerBundle\Annotation\Schema;
-use Haskel\SchemaSerializer\EntityExtractor\ExtractorGenerator;
-use Haskel\SchemaSerializer\Exception\ExtractorGeneratorException;
-use Haskel\SchemaSerializer\Formatter\DatetimeFormatter;
-use Haskel\SchemaSerializer\Serializer;
+use Haskel\MapSerializer\EntityExtractor\ExtractorGenerator;
+use Haskel\MapSerializer\Exception\ExtractorGeneratorException;
+use Haskel\MapSerializer\Formatter\DatetimeFormatter;
+use Haskel\MapSerializer\Serializer;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

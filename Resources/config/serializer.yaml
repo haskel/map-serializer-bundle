@@ -1,3 +1,4 @@
 services:
   haskel.map_serializer.serializer:
-    class: 'Haskel\SchemaSerializer\Serializer'
+    public: true
+    class: 'Haskel\MapSerializer\Serializer'
