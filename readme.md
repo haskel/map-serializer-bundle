@@ -14,8 +14,9 @@ Add bundle to `config/bundles.php`
 Haskel\MapSerializerBundle\MapSerializerBundle::class => ['all' => true]
 ```
 <br>
+
 Add yaml schemas to `config/map_serializer`
-Example `config/map_serializer/User.yaml`:
+Example `config/map_serializer/User.yaml` :
 ```yaml
 App\Entity\User:
   default:
