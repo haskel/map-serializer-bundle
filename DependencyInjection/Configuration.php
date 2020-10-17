@@ -41,8 +41,8 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('map_serializer', 'array');
+        $treeBuilder = new TreeBuilder('map_serializer', 'array');
+        $rootNode = $treeBuilder->getRootNode();
 
         // json_options
         // extractors
